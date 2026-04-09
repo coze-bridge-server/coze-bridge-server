@@ -1,0 +1,130 @@
+{
+    "_meta": {
+        "description": "가전 구독 상품 DB — 이 파일만 교체하면 카드 데이터가 바뀝니다",
+        "updated": "2026-04-06"
+    },
+    "products": [
+        {
+            "model": "WD722RK",
+            "product_name": "LG 퓨리케어 오브제컬렉션 얼음정수기(블랙)",
+            "category": "정수기",
+            "color": "블랙",
+            "lineup": "얼음(2세대)",
+            "features": "얼음+냉/온/정",
+            "image_url": "https://imhyun-bot.duckdns.org/images/WD722RK.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=8471",
+            "price": 51900,
+            "discount_price": 29900,
+            "keywords": [
+                "얼음정수기",
+                "블랙",
+                "WD722RK",
+                "얼음",
+                "2세대"
+            ]
+        },
+        {
+            "model": "WD722RH",
+            "product_name": "LG 퓨리케어 오브제컬렉션 얼음정수기(에센스화이트)",
+            "category": "정수기",
+            "color": "화이트",
+            "lineup": "얼음(2세대)",
+            "features": "얼음+냉/온/정",
+            "image_url": "https://imhyun-bot.duckdns.org/images/WD722RH.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=8467",
+            "price": 51900,
+            "discount_price": 29900,
+            "keywords": [
+                "얼음정수기",
+                "화이트",
+                "에센스화이트",
+                "WD722RH",
+                "얼음",
+                "2세대"
+            ]
+        },
+        {
+            "model": "WD722RE",
+            "product_name": "LG 퓨리케어 오브제컬렉션 얼음정수기(카밍베이지)",
+            "category": "정수기",
+            "color": "베이지",
+            "lineup": "얼음(2세대)",
+            "features": "얼음+냉/온/정",
+            "image_url": "https://imhyun-bot.duckdns.org/images/WD722RE.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=8474",
+            "price": 51900,
+            "discount_price": 29900,
+            "keywords": [
+                "얼음정수기",
+                "베이지",
+                "카밍베이지",
+                "WD722RE",
+                "얼음",
+                "2세대"
+            ]
+        },
+        {
+            "model": "W826MNQ482S",
+            "product_name": "LG 디오스 AI 오브제컬렉션 STEM 얼음정수 냉장고(노크온 매직스페이스, 네이비/에센스화이트)",
+            "category": "냉장고",
+            "color": "네이비/화이트",
+            "lineup": "817L",
+            "features": "노크온, 매직스페이스, STEM 얼음정수",
+            "image_url": "https://imhyun-bot.duckdns.org/images/W826MNQ482S.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=8161",
+            "price": 119900,
+            "discount_price": 93900,
+            "keywords": [
+                "냉장고",
+                "디오스",
+                "STEM",
+                "노크온",
+                "매직스페이스",
+                "얼음정수",
+                "817L",
+                "W826MNQ482S"
+            ]
+        },
+        {
+            "model": "T875MHH141",
+            "product_name": "LG 디오스 오브제컬렉션 STEM 베이직 냉장고(매직스페이스, 크림화이트/크림화이트)",
+            "category": "냉장고",
+            "color": "크림화이트",
+            "lineup": "860L",
+            "features": "매직스페이스, STEM",
+            "image_url": "https://imhyun-bot.duckdns.org/images/T875MHH141.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=5971",
+            "price": 57900,
+            "discount_price": 31900,
+            "keywords": [
+                "냉장고",
+                "디오스",
+                "STEM",
+                "베이직",
+                "매직스페이스",
+                "860L",
+                "크림화이트",
+                "T875MHH141"
+            ]
+        },
+        {
+            "model": "DEE6BGE",
+            "product_name": "LG 디오스 오브제컬렉션 식기세척기 14인용 빌트인",
+            "category": "식기세척기",
+            "color": "네이처베이지",
+            "lineup": "14인용",
+            "features": "빌트인, 연수장치, 통살균 클리닝, 에어필터 무상 교체",
+            "image_url": "https://imhyun-bot.duckdns.org/images/DEE6BGE.jpg",
+            "button_url": "https://lifegood.co.kr/product.php?no=6733",
+            "price": 51900,
+            "discount_price": 18500,
+            "keywords": [
+                "식기세척기",
+                "빌트인",
+                "14인용",
+                "DEE6BGE",
+                "디오스"
+            ]
+        }
+    ]
+}

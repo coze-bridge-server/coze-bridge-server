@@ -1,0 +1,31 @@
+{$DOMAIN:imhyun-bot.duckdns.org} {
+    # /images/* 경로는 static file serve (이미지 전용)
+    handle /images/* {
+        root * /srv
+        file_server
+        header {
+            Cache-Control "public, max-age=86400"
+            Access-Control-Allow-Origin "*"
+        }
+    }
+
+    # 나머지는 FastAPI 앱으로 리버스 프록시
+    handle {
+        reverse_proxy app:8000
+    }
+
+    # 요청 로그
+    log {
+        output file /data/logs/access.log {
+            roll_size 10mb
+            roll_keep 3
+        }
+    }
+
+    # 보안 헤더
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        -Server
+    }
+}

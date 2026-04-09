@@ -1,0 +1,57 @@
+# ============================================
+# Coze Bridge Server — Docker Compose 설정
+# app: FastAPI 브릿지 서버
+# caddy: HTTPS 리버스 프록시 (Let's Encrypt 자동 인증서)
+# ============================================
+
+services:
+  # --- 브릿지 서버 (FastAPI + Uvicorn) ---
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coze-bridge-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # clients.json을 컨테이너 내부에 마운트 (핫 리로드 지원)
+      - ./clients.json:/app/clients.json:ro
+    ports:
+      # Caddy가 리버스 프록시하므로 호스트에 직접 노출할 필요 없음
+      # 디버깅용으로 localhost만 노출
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"    # 로그 파일 최대 10MB
+        max-file: "3"      # 최대 3개 파일 로테이션
+
+  # --- Caddy 리버스 프록시 (HTTPS 자동 인증서) ---
+  caddy:
+    image: caddy:2-alpine
+    container_name: coze-bridge-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"      # HTTP -> HTTPS 리다이렉트
+      - "443:443"    # HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data       # 인증서 저장소
+      - caddy_config:/config   # Caddy 설정 캐시
+      - ./static/images:/srv/images:ro
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local

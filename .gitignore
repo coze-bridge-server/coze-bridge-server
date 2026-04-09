@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.*
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.cursor/
+.idea/
+.vscode/
+
+# 민감 설정 파일 (절대 커밋 금지)
+clients.json
+*.pem
+*.key
+
+# Docker 볼륨 / 로그
+caddy_data/
+caddy_config/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+*.pem
+
+*.sh
+*.bak
