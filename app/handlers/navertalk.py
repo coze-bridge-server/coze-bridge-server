@@ -356,25 +356,38 @@ class NaverTalkHandler(BaseMessageHandler):
                 return
 
             # --- 텍스트와 카드를 순서대로 분리 전송 ---
+# --- 텍스트와 카드를 순서대로 분리 전송 ---
             text = coze_result.get("text", "")
             cards = coze_result.get("cards", [])
+            suggestions = coze_result.get("suggestions", [])
 
             card_response = None
             if cards:
                 try:
                     card_response = build_navertalk_card_response(cards)
                 except Exception as e:
-                    logger.error(f"네이버톡톡 비동기 카드 빌드 예외: {type(e).__name__}: {str(e)}")
+                    logger.error(
+                        f"네이버톡톡 비동기 카드 빌드 예외: {type(e).__name__}: {str(e)}")
+
+            # 추천 질문 버튼 빌드 (텍스트 전송 시 함께 표시)
+            suggestion_buttons = self._build_suggestion_buttons(suggestions)
 
             if text and card_response:
-                # 1) 텍스트 먼저 전송
-                await self._send_and_log(user_id, chat_id, self._text_response(text), label="텍스트")
+                # 1) 텍스트 먼저 전송 (추천 질문 버튼 포함)
+                if suggestion_buttons:
+                    await self._send_and_log(user_id, chat_id, self._text_with_buttons_response(text, suggestion_buttons), label="텍스트+버튼")
+                else:
+                    await self._send_and_log(user_id, chat_id, self._text_response(text), label="텍스트")
                 # 2) 카드 후발송
                 await self._send_and_log(user_id, chat_id, card_response, label="카드")
             elif card_response:
                 await self._send_and_log(user_id, chat_id, card_response, label="카드")
             elif text:
-                await self._send_and_log(user_id, chat_id, self._text_response(text), label="텍스트")
+                # 텍스트만 전송 (추천 질문 버튼 포함)
+                if suggestion_buttons:
+                    await self._send_and_log(user_id, chat_id, self._text_with_buttons_response(text, suggestion_buttons), label="텍스트+버튼")
+                else:
+                    await self._send_and_log(user_id, chat_id, self._text_response(text), label="텍스트")
             else:
                 await self._send_and_log(user_id, chat_id, self._text_response("죄송합니다 응답을 생성하지 못했습니다"))
 
