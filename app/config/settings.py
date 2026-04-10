@@ -69,6 +69,36 @@ class Settings(BaseSettings):
     # 할인가만 있을 때
     CARD_DISCOUNT_ONLY_FORMAT: str = "월 {discount_price}"
 
+    # =====================================================================
+    # Auto-suggestion 글자수 제한 — Coze 추천 질문 truncate 설정
+    # =====================================================================
+
+    # 카카오 quickReplies label 최대 글자수 (초과 시 "..." 붙여서 자르기)
+    SUGGESTION_MAX_LENGTH_KAKAO: int = 14
+    # 네이버톡톡 buttonList title 최대 글자수 (초과 시 "..." 붙여서 자르기)
+    SUGGESTION_MAX_LENGTH_TALK: int = 18
+
+    # =====================================================================
+    # 카카오 웰컴카드 설정 — 첫 메시지 시 자동 표시
+    # =====================================================================
+
+    # 웰컴카드 이미지 URL (EC2 내부 Caddy가 서빙하는 static 이미지 경로)
+    WELCOME_IMAGE_URL: str = "https://imhyun-bot.duckdns.org/images/welcome.jpg"
+    # 웰컴카드 인사말 텍스트
+    WELCOME_MESSAGE: str = "반갑습니다. 가전 전문가의 노하우를 담은 LG전자 구독 AI 매니저입니다. AI가 실시간으로 최적의 가전 구독 설계를 도와드립니다."
+    # 웰컴카드 버튼1: 맞춤 가전 추천받기 (텍스트 발화)
+    WELCOME_BTN1_LABEL: str = "맞춤 가전 추천받기"
+    WELCOME_BTN1_VALUE: str = "맞춤 가전 추천받기"
+    # 웰컴카드 버튼2: LG전자 구독 혜택 확인 (URL 이동)
+    WELCOME_BTN2_LABEL: str = "LG전자 구독 혜택 확인"
+    WELCOME_BTN2_URL: str = "https://www.lge.co.kr/subscribe"
+    # 웰컴카드 버튼3: 상담사 연결 (상담톡 전환)
+    WELCOME_BTN3_LABEL: str = "상담사 연결(직접 문의)"
+    # 세션 만료 시간 (초) — 이 시간 이후 재진입 시 다시 웰컴카드 표시
+    WELCOME_SESSION_TIMEOUT: int = 1800
+    # 웰컴카드 모드: A = 웰컴카드만 반환(AI답변은 다음 메시지부터) / B = 웰컴카드 즉시 + AI답변 콜백
+    WELCOME_MODE: str = "B"
+
     # 카카오 BasicCard 캐러셀 고정비율 설정
     CARD_KAKAO_FIXED_RATIO: bool = False           # 카카오 thumbnail fixedRatio
 

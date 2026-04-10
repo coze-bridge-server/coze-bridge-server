@@ -127,12 +127,16 @@ class NaverTalkHandler(BaseMessageHandler):
 
         톡톡은 한 응답에 textContent OR compositeContent 하나만 가능
         → 카드가 있으면 카드를 메인 응답으로, 텍스트는 보내기 API로 선발송
+
+        추가: suggestions → compositeContent의 buttonList로 변환
+        (텍스트 응답 시 compositeContent로 전환하여 버튼 추가)
         """
         if not coze_result["success"] and not coze_result["timed_out"]:
             return self._text_response("죄송합니다 일시적인 오류가 발생했습니다")
 
         text = coze_result.get("text", "")
         cards = coze_result.get("cards", [])
+        suggestions = coze_result.get("suggestions", [])
 
         # --- 카드 빌드 ---
         card_response = None
@@ -154,8 +158,12 @@ class NaverTalkHandler(BaseMessageHandler):
         if card_response:
             return card_response
 
-        # --- 텍스트만 ---
+        # --- 텍스트만 (+ 추천 질문 버튼) ---
         if text:
+            # suggestions가 있으면 compositeContent로 전환하여 버튼 추가
+            suggestion_buttons = self._build_suggestion_buttons(suggestions)
+            if suggestion_buttons:
+                return self._text_with_buttons_response(text, suggestion_buttons)
             return self._text_response(text)
 
         return self._text_response("죄송합니다 응답을 생성하지 못했습니다")
@@ -463,6 +471,84 @@ class NaverTalkHandler(BaseMessageHandler):
     # =========================================================================
     # 헬퍼 메서드
     # =========================================================================
+
+    @staticmethod
+    def _build_suggestion_buttons(suggestions: list[str]) -> list[dict]:
+        """
+        Coze Auto-suggestion 추천 질문을 네이버톡톡 buttonList로 변환
+
+        - title: 최대 SUGGESTION_MAX_LENGTH_TALK 글자 (초과 시 "…" 붙여서 자르기)
+        - code: 원본 전체 텍스트 (클릭 시 code 값이 send 이벤트로 전송)
+        - 네이버톡톡 buttonList 최대 10개 제한
+
+        네이버톡톡 TEXT 버튼 스펙:
+        {
+            "type": "TEXT",
+            "data": {
+                "title": "표시 텍스트 (18자)",
+                "code": "실제 전송 텍스트 (원본)"
+            }
+        }
+        """
+        if not suggestions:
+            return []
+
+        settings = get_settings()
+        max_len = settings.SUGGESTION_MAX_LENGTH_TALK
+        buttons = []
+
+        for suggestion in suggestions[:10]:  # 톡톡 최대 10개
+            original = suggestion.strip()
+            if not original:
+                continue
+
+            # title truncate: 최대 글자수 초과 시 "…" 붙이기
+            if len(original) > max_len:
+                title = original[:max_len - 1] + "…"
+            else:
+                title = original
+
+            buttons.append({
+                "type": "TEXT",
+                "data": {
+                    "title": title,
+                    "code": original,  # 원본 전체 텍스트가 발화로 전송
+                },
+            })
+
+        if buttons:
+            logger.info(f"네이버톡톡 suggestion 버튼 {len(buttons)}개 생성")
+
+        return buttons
+
+    @staticmethod
+    def _text_with_buttons_response(text: str, buttons: list[dict]) -> dict:
+        """
+        텍스트 + 추천 질문 버튼을 compositeContent로 변환
+
+        네이버톡톡은 textContent에 buttonList를 넣을 수 없으므로
+        compositeContent로 전환하여 텍스트 + 버튼을 함께 표시
+        """
+        if not text or not text.strip():
+            text = "죄송합니다 응답을 생성하지 못했습니다"
+
+        # compositeContent title 최대 200자 제한 (네이버톡톡 공식)
+        if len(text) > 200:
+            text = text[:197] + "..."
+
+        composite = {
+            "title": text,
+        }
+
+        if buttons:
+            composite["buttonList"] = buttons
+
+        return {
+            "event": "send",
+            "compositeContent": {
+                "compositeList": [composite],
+            },
+        }
 
     @staticmethod
     def _text_response(text: str) -> dict:
