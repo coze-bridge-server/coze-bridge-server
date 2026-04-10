@@ -449,6 +449,11 @@ class KakaoHandler(BaseMessageHandler):
             else:
                 response_body = self._error_response(settings.ERROR_MESSAGE)
 
+            # 콜백 응답에서 quickReplies 제거 (카카오 콜백은 quickReplies 미지원 → 400 에러 방지)
+            if "template" in response_body and "quickReplies" in response_body.get("template", {}):
+                del response_body["template"]["quickReplies"]
+                logger.info("카카오 웰컴 콜백 응답에서 quickReplies 제거")
+
             # 콜백 전송 전 최소 대기
             await asyncio.sleep(1.0)
 
@@ -508,6 +513,11 @@ class KakaoHandler(BaseMessageHandler):
                 error_msg = coze_result.get("error", "응답 생성에 실패했습니다")
                 logger.error(f"카카오 콜백 Coze 폴링 실패: {error_msg}")
                 response_body = self._error_response(settings.ERROR_MESSAGE)
+
+            # 콜백 응답에서 quickReplies 제거 (카카오 콜백은 quickReplies 미지원 → 400 에러 방지)
+            if "template" in response_body and "quickReplies" in response_body.get("template", {}):
+                del response_body["template"]["quickReplies"]
+                logger.info("카카오 콜백 응답에서 quickReplies 제거")
 
             await asyncio.sleep(1.0)
 

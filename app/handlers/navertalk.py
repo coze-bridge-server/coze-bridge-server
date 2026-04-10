@@ -532,6 +532,10 @@ class NaverTalkHandler(BaseMessageHandler):
         if not text or not text.strip():
             text = "죄송합니다 응답을 생성하지 못했습니다"
 
+        # compositeContent title 최대 200자 제한 (네이버톡톡 공식)
+        if len(text) > 200:
+            text = text[:197] + "..."
+
         composite = {
             "title": text,
         }
