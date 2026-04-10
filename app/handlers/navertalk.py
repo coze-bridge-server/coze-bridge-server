@@ -146,12 +146,20 @@ class NaverTalkHandler(BaseMessageHandler):
             except Exception as e:
                 logger.error(f"네이버톡톡 카드 빌드 예외: {type(e).__name__}: {str(e)}")
 
-        # --- 텍스트 + 카드 동시 존재 ---
+   # --- 텍스트 + 카드 동시 존재 ---
         if text and card_response:
             # 텍스트를 보내기 API로 먼저 전송 후 카드를 웹훅 응답으로 반환
             user_id = parsed.get("user_id", "")
             if user_id:
-                asyncio.create_task(self._send_text_before_card(user_id, text))
+                # 추천 질문 버튼이 있으면 텍스트+버튼으로 선발송
+                suggestion_buttons = self._build_suggestion_buttons(
+                    suggestions)
+                if suggestion_buttons:
+                    asyncio.create_task(self._send_composite_before_card(
+                        user_id, text, suggestion_buttons))
+                else:
+                    asyncio.create_task(
+                        self._send_text_before_card(user_id, text))
             return card_response
 
         # --- 카드만 ---
@@ -168,13 +176,27 @@ class NaverTalkHandler(BaseMessageHandler):
 
         return self._text_response("죄송합니다 응답을 생성하지 못했습니다")
 
-    async def _send_text_before_card(self, user_id: str, text: str) -> None:
-        """카드 응답 전에 텍스트를 보내기 API로 선발송"""
+    async def _send_composite_before_card(self, user_id: str, text: str, buttons: list[dict]) -> None:
+        """카드 응답 전에 텍스트+추천질문 버튼을 보내기 API로 선발송"""
         try:
-            await self.send_message(user_id, text)
-            logger.info(f"네이버톡톡 텍스트 선발송 완료 user={user_id[:10]}...")
+            response_body = self._text_with_buttons_response(text, buttons)
+            payload = {**response_body, "user": user_id}
+
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.post(
+                    NAVER_TALK_SEND_API,
+                    json=payload,
+                    headers={
+                        "Content-Type": "application/json;charset=UTF-8",
+                        "Authorization": self._token,
+                    },
+                )
+
+            logger.info(
+                f"네이버톡톡 텍스트+버튼 선발송 완료 status={resp.status_code} user={user_id[:10]}...")
         except Exception as e:
-            logger.warning(f"네이버톡톡 텍스트 선발송 실패: {type(e).__name__}: {str(e)}")
+            logger.warning(
+                f"네이버톡톡 텍스트+버튼 선발송 실패: {type(e).__name__}: {str(e)}")
 
     # =========================================================================
     # 4. 타임아웃 처리
