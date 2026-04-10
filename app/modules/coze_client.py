@@ -268,15 +268,26 @@ class CozeClient:
         1. [CARDS]...[/CARDS] 태그 → 태그 내부 JSON을 카드로 추출
         2. content 전체가 순수 JSON → 카드 데이터로 처리
         3. 위 두 가지 해당 안 되면 → 텍스트 + 상품 DB 자동 매칭
+
+        추가: type=follow_up 메시지 → suggestions 리스트로 추출
         """
         text_parts = []
         cards = []
+        suggestions = []  # Coze Auto-suggestion 추천 질문
 
         for msg in messages:
-            if msg.get("type") != "answer" or msg.get("role") != "assistant":
+            msg_type = msg.get("type", "")
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+
+            # --- follow_up 타입: 추천 질문(Auto-suggestion) 추출 ---
+            if msg_type == "follow_up" and content.strip():
+                suggestions.append(content.strip())
                 continue
 
-            content = msg.get("content", "")
+            # --- answer 타입만 본답변으로 처리 ---
+            if msg_type != "answer" or role != "assistant":
+                continue
 
             # --- 1단계: [CARDS]...[/CARDS] 태그 기반 추출 ---
             extracted_cards, remaining_text = self._extract_cards_from_tags(
@@ -313,10 +324,15 @@ class CozeClient:
             except Exception as e:
                 logger.warning(f"상품 자동 매칭 실패: {type(e).__name__}: {str(e)}")
 
+        # === 로깅: 추천 질문 수 ===
+        if suggestions:
+            logger.info(f"Coze 추천 질문 {len(suggestions)}개 추출: {[s[:30] for s in suggestions]}")
+
         return {
             "success": True,
             "text": full_text,
             "cards": cards,
+            "suggestions": suggestions,
             "timed_out": False,
             "chat_id": chat_id,
             "conversation_id": conversation_id,
@@ -386,6 +402,7 @@ class CozeClient:
             "success": False,
             "text": "",
             "cards": [],
+            "suggestions": [],
             "timed_out": True,
             "chat_id": chat_id,
             "conversation_id": conversation_id,
@@ -398,6 +415,7 @@ class CozeClient:
             "success": False,
             "text": "",
             "cards": [],
+            "suggestions": [],
             "timed_out": False,
             "chat_id": "",
             "conversation_id": "",
